@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">LoanChecker</string>
+    <string name="greetings">Hi</string>
+    <string name="add_currency">Add currency:</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+</resources>
