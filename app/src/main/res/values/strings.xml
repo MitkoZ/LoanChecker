@@ -4,4 +4,7 @@
     <string name="add_currency">Add currency:</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
+    <string name="give_a_loan_to">Give a Loan To:</string>
+    <string name="amount">Amount:</string>
+    <string name="return_date">Return date:</string>
 </resources>

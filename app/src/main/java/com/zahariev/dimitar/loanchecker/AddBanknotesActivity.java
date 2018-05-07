@@ -15,6 +15,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.zahariev.dimitar.bindmodels.UserBanknoteAmountBindModel;
 import com.zahariev.dimitar.bindmodels.UserCurrencyBindModel;
@@ -132,10 +133,47 @@ public class AddBanknotesActivity extends AppCompatActivity implements Banknotes
 
     private void saveDataToDatabase(UserBanknoteAmountBindModel userBanknoteAmountBindModel) {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference("userBanknoteAmount");
+        checkIfUserHasBanknoteInDatabase(userBanknoteAmountBindModel.banknoteType, Utils.googleAccount.getId(),database);
         String key = database.push().getKey();
         Map<String, Object> userBanknoteAmountMap = new HashMap<>();
         userBanknoteAmountMap.put(key, userBanknoteAmountBindModel);
         database.updateChildren(userBanknoteAmountMap);
+    }
+
+    private void checkIfUserHasBanknoteInDatabase(String banknoteType, String userId, DatabaseReference database) {
+
+        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference userBanknoteAmountRef = rootRef.child("userBanknoteAmount");
+        Query firebaseQuery = userBanknoteAmountRef.orderByChild("userId").equalTo(userId);
+        firebaseQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    Log.d("test", "onDataChange: "+postSnapshot.child("userId").getValue(String.class));//todo not working
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.wtf("onCancelledError", "loadPost:onCancelled", databaseError.toException());
+            }
+        });
+
+//        Query firebaseQuery = database.orderByChild("userId").equalTo(userId);
+//        firebaseQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+//                 //todo
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                Log.wtf("onCancelledError", "loadPost:onCancelled", databaseError.toException());
+//            }
+//        });
+
     }
 
     @Override

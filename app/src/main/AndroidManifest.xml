@@ -18,7 +18,8 @@
         </activity>
         <activity android:name=".MyMoneyActivity" />
         <activity android:name=".AddBanknotesActivity" />
-        <activity android:name=".AddCurrencyActivity"></activity>
+        <activity android:name=".AddCurrencyActivity" />
+        <activity android:name=".GiveALoanActivity"></activity>
     </application>
 
 </manifest>

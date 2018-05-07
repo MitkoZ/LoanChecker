@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".GiveALoanActivity"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/give_a_loan_to"
+        />
+
+    <EditText
+        android:id="@+id/loanerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/amount"
+        />
+
+    <EditText
+        android:id="@+id/moneyAmountToLoan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+
+    <Spinner
+        android:id="@+id/currencySpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:drawable/btn_dropdown"
+        android:spinnerMode="dropdown"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/return_date"
+        />
+
+    <DatePicker
+        android:id="@+id/returnDateDatePicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        >
+
+    </DatePicker>
+
+<Button
+    android:id="@+id/submitLoan"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:onClick="submitLoan"
+    />
+</LinearLayout>

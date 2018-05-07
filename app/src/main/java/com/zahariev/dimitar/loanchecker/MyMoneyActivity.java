@@ -40,4 +40,8 @@ public class MyMoneyActivity extends AppCompatActivity {
         startActivity(addPossibleCurrenciesItent);
     }
 
+    public void giveALoan(View view) {
+        Intent giveALoanIntent = new Intent(this, GiveALoanActivity.class);
+        startActivity(giveALoanIntent);
+    }
 }
