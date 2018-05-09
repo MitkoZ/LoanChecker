@@ -79,17 +79,17 @@ public class AddBanknotesActivity extends AppCompatActivity implements Banknotes
                     currencies.add(userCurrencyBindModel.currency);
                 }
 
-                ViewGroup banknotesFragment = findViewById(R.id.banknotes_fragment);
+                ViewGroup banknotesFragmentGridLayout = findViewById(R.id.banknotes_fragment_grid_layout);
                 for (String currency : currencies) {
                     for (int banknote : Utils.BANKNOTES) {
                         EditText amountEditText = new EditText(getApplicationContext());
                         amountEditText.setId(View.generateViewId());
                         amountEditText.setText("0");// default banknote amount is 0
                         Utils.programmaticallyAssignedIds.put(banknote + "_" + currency, amountEditText.getId());
-                        banknotesFragment.addView(amountEditText);
+                        banknotesFragmentGridLayout.addView(amountEditText);
                         TextView amountBanknotesTextView = new TextView(getApplicationContext());
                         amountBanknotesTextView.setText(MessageFormat.format("x {0} {1}", banknote, currency));
-                        banknotesFragment.addView(amountBanknotesTextView);
+                        banknotesFragmentGridLayout.addView(amountBanknotesTextView);
                     }
                 }
                 Button submitButton = new Button(getApplicationContext());
@@ -106,8 +106,8 @@ public class AddBanknotesActivity extends AppCompatActivity implements Banknotes
                         finish();
                     }
                 });
-                banknotesFragment.addView(submitButton);
-                banknotesFragment.addView(cancelButton);
+                banknotesFragmentGridLayout.addView(submitButton);
+                banknotesFragmentGridLayout.addView(cancelButton);
             }
 
 
@@ -127,13 +127,13 @@ public class AddBanknotesActivity extends AppCompatActivity implements Banknotes
             UserBanknoteAmountBindModel userBanknoteAmountBindModel = new UserBanknoteAmountBindModel();
             userBanknoteAmountBindModel.userId = Utils.googleAccount.getId();
             userBanknoteAmountBindModel.banknoteType = programmaticallyAssignedIdEntry.getKey();
-            userBanknoteAmountBindModel.banknoteAmount = amountEditText.getText().toString();
+            userBanknoteAmountBindModel.banknoteAmount = Integer.parseInt(amountEditText.getText().toString());
             userBanknoteAmountBindModelList.add(userBanknoteAmountBindModel);
         }
         ISaveToDatabaseCallback saveToDatabaseCallback = new ISaveToDatabaseCallback() {
             @Override
-            public void onCallback(HashMap<String, UserBanknoteAmountBindModel> myBanknotesDb) {
-                saveDataToDatabase(userBanknoteAmountBindModelList, myBanknotesDb);
+            public void onCallback(HashMap<String, UserBanknoteAmountBindModel> myBanknotesFromDb) {
+                saveDataToDatabase(userBanknoteAmountBindModelList, myBanknotesFromDb);
             }
         };
         getUserBanknotesFromDatabase(Utils.googleAccount.getId(), saveToDatabaseCallback);
@@ -152,13 +152,14 @@ public class AddBanknotesActivity extends AppCompatActivity implements Banknotes
                 userBanknoteAmountBindModelForDb.userId = currentUserBanknoteFromDatabaseBindModel.userId;
                 userBanknoteAmountBindModelForDb.banknoteAmount = currentUserBanknoteFromDatabaseBindModel.banknoteAmount;
                 database.child(currentUserBanknoteFromDatabaseBindModel.id).setValue(userBanknoteAmountBindModelForDb);
-            } else {
-                //make a new record in the db
-                String key = database.push().getKey();
-                Map<String, Object> userBanknoteAmountMap = new HashMap<>();
-                userBanknoteAmountMap.put(key, userBanknoteAmountBindModel);
-                database.updateChildren(userBanknoteAmountMap);
             }
+            //else {
+            //make a new record in the db
+//                String key = database.push().getKey();
+//                Map<String, Object> userBanknoteAmountMap = new HashMap<>();
+//                userBanknoteAmountMap.put(key, userBanknoteAmountBindModel);
+//                database.updateChildren(userBanknoteAmountMap);
+            //}
 
         }
     }
@@ -178,7 +179,7 @@ public class AddBanknotesActivity extends AppCompatActivity implements Banknotes
                     UserBanknoteAmountBindModel userBanknoteAmountBindModel = new UserBanknoteAmountBindModel();
                     userBanknoteAmountBindModel.banknoteType = banknoteTypeDb;
                     userBanknoteAmountBindModel.userId = userId;
-                    userBanknoteAmountBindModel.banknoteAmount = Integer.toString(banknoteAmountDb);
+                    userBanknoteAmountBindModel.banknoteAmount = banknoteAmountDb;
                     userBanknoteAmountBindModel.id = userBanknoteAmountSnapshot.getKey();
                     myBanknotesDb.put(banknoteTypeDb, userBanknoteAmountBindModel);
                 }

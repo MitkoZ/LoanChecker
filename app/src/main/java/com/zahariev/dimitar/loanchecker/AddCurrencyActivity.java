@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.zahariev.dimitar.bindmodels.UserBanknoteAmountBindModel;
 import com.zahariev.dimitar.bindmodels.UserCurrencyBindModel;
 import com.zahariev.dimitar.utils.Utils;
 
@@ -36,6 +37,7 @@ public class AddCurrencyActivity extends AppCompatActivity {
         writeUserCurrency(userCurrencyBindModel);
         Toast.makeText(this, "Currency added successfully!", Toast.LENGTH_SHORT).show();
         editTextView.setText("");
+        initializeUserBanknoteAmount(currency);
     }
 
     private void writeUserCurrency(UserCurrencyBindModel userCurrencyBindModel) {
@@ -45,6 +47,20 @@ public class AddCurrencyActivity extends AppCompatActivity {
         String key = mDatabaseReference.push().getKey();
         userCurrencyMap.put(key, userCurrencyBindModel);
         mDatabaseReference.updateChildren(userCurrencyMap);
+    }
+
+    private void initializeUserBanknoteAmount(String currency) { //initialize each possible banknote with amount 0
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference("userBanknoteAmount");
+        Map<String, Object> userBanknoteAmountMap = new HashMap<>();
+        for (int banknote : Utils.BANKNOTES) {
+            UserBanknoteAmountBindModel userBanknoteAmountBindModel = new UserBanknoteAmountBindModel();
+            String key = database.push().getKey();
+            userBanknoteAmountBindModel.userId = Utils.googleAccount.getId();
+            userBanknoteAmountBindModel.banknoteAmount = 0;
+            userBanknoteAmountBindModel.banknoteType = banknote + "_" + currency;
+            userBanknoteAmountMap.put(key, userBanknoteAmountBindModel);
+        }
+        database.updateChildren(userBanknoteAmountMap);
     }
 
     public void cancel(View view) {

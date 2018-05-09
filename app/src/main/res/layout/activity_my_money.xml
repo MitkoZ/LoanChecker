@@ -10,10 +10,18 @@
         android:layout_height="wrap_content"
         android:layout_gravity="right" />
 
-    <TextView
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="My money: " />
+        android:id="@+id/my_money_layout"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/my_money" />
+
+    </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"
@@ -35,7 +43,6 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Give a loan"
         android:onClick="giveALoan"
-        />
+        android:text="Give a loan" />
 </LinearLayout>
