@@ -19,6 +19,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.zahariev.dimitar.bindmodels.UserBanknoteAmountBindModel;
 import com.zahariev.dimitar.bindmodels.UserCurrencyBindModel;
+import com.zahariev.dimitar.utils.ISaveToDatabaseCallback;
 import com.zahariev.dimitar.utils.Utils;
 
 import java.text.MessageFormat;
@@ -120,37 +121,68 @@ public class AddBanknotesActivity extends AppCompatActivity implements Banknotes
     }
 
     private void submitMyData(View view) {
+        final List<UserBanknoteAmountBindModel> userBanknoteAmountBindModelList = new ArrayList<>();
         for (Map.Entry<String, Integer> programmaticallyAssignedIdEntry : Utils.programmaticallyAssignedIds.entrySet()) {
             EditText amountEditText = findViewById(programmaticallyAssignedIdEntry.getValue());
             UserBanknoteAmountBindModel userBanknoteAmountBindModel = new UserBanknoteAmountBindModel();
             userBanknoteAmountBindModel.userId = Utils.googleAccount.getId();
             userBanknoteAmountBindModel.banknoteType = programmaticallyAssignedIdEntry.getKey();
             userBanknoteAmountBindModel.banknoteAmount = amountEditText.getText().toString();
-            saveDataToDatabase(userBanknoteAmountBindModel);
+            userBanknoteAmountBindModelList.add(userBanknoteAmountBindModel);
         }
-
+        ISaveToDatabaseCallback saveToDatabaseCallback = new ISaveToDatabaseCallback() {
+            @Override
+            public void onCallback(HashMap<String, UserBanknoteAmountBindModel> myBanknotesDb) {
+                saveDataToDatabase(userBanknoteAmountBindModelList, myBanknotesDb);
+            }
+        };
+        getUserBanknotesFromDatabase(Utils.googleAccount.getId(), saveToDatabaseCallback);
     }
 
-    private void saveDataToDatabase(UserBanknoteAmountBindModel userBanknoteAmountBindModel) {
+    private void saveDataToDatabase(List<UserBanknoteAmountBindModel> userBanknoteAmountBindModelList, HashMap<String, UserBanknoteAmountBindModel> userBanknotesFromDatabase) {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference("userBanknoteAmount");
-        checkIfUserHasBanknoteInDatabase(userBanknoteAmountBindModel.banknoteType, Utils.googleAccount.getId(),database);
-        String key = database.push().getKey();
-        Map<String, Object> userBanknoteAmountMap = new HashMap<>();
-        userBanknoteAmountMap.put(key, userBanknoteAmountBindModel);
-        database.updateChildren(userBanknoteAmountMap);
+        for (final UserBanknoteAmountBindModel userBanknoteAmountBindModel :
+                userBanknoteAmountBindModelList) {
+            if (userBanknotesFromDatabase.containsKey(userBanknoteAmountBindModel.banknoteType)) {
+                //update the record in the db
+                UserBanknoteAmountBindModel currentUserBanknoteFromDatabaseBindModel = userBanknotesFromDatabase.get((userBanknoteAmountBindModel.banknoteType));
+                currentUserBanknoteFromDatabaseBindModel.banknoteAmount = userBanknoteAmountBindModel.banknoteAmount;
+                UserBanknoteAmountBindModel userBanknoteAmountBindModelForDb = new UserBanknoteAmountBindModel();
+                userBanknoteAmountBindModelForDb.banknoteType = currentUserBanknoteFromDatabaseBindModel.banknoteType;
+                userBanknoteAmountBindModelForDb.userId = currentUserBanknoteFromDatabaseBindModel.userId;
+                userBanknoteAmountBindModelForDb.banknoteAmount = currentUserBanknoteFromDatabaseBindModel.banknoteAmount;
+                database.child(currentUserBanknoteFromDatabaseBindModel.id).setValue(userBanknoteAmountBindModelForDb);
+            } else {
+                //make a new record in the db
+                String key = database.push().getKey();
+                Map<String, Object> userBanknoteAmountMap = new HashMap<>();
+                userBanknoteAmountMap.put(key, userBanknoteAmountBindModel);
+                database.updateChildren(userBanknoteAmountMap);
+            }
+
+        }
     }
 
-    private void checkIfUserHasBanknoteInDatabase(String banknoteType, String userId, DatabaseReference database) {
+    private void getUserBanknotesFromDatabase(final String userId, final ISaveToDatabaseCallback myCallback) {
 
         DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
         DatabaseReference userBanknoteAmountRef = rootRef.child("userBanknoteAmount");
         Query firebaseQuery = userBanknoteAmountRef.orderByChild("userId").equalTo(userId);
+        final HashMap<String, UserBanknoteAmountBindModel> myBanknotesDb = new HashMap<>();
         firebaseQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    Log.d("test", "onDataChange: "+postSnapshot.child("userId").getValue(String.class));//todo not working
+                for (DataSnapshot userBanknoteAmountSnapshot : dataSnapshot.getChildren()) {
+                    String banknoteTypeDb = userBanknoteAmountSnapshot.child("banknoteType").getValue().toString();
+                    int banknoteAmountDb = Integer.parseInt(userBanknoteAmountSnapshot.child("banknoteAmount").getValue().toString());
+                    UserBanknoteAmountBindModel userBanknoteAmountBindModel = new UserBanknoteAmountBindModel();
+                    userBanknoteAmountBindModel.banknoteType = banknoteTypeDb;
+                    userBanknoteAmountBindModel.userId = userId;
+                    userBanknoteAmountBindModel.banknoteAmount = Integer.toString(banknoteAmountDb);
+                    userBanknoteAmountBindModel.id = userBanknoteAmountSnapshot.getKey();
+                    myBanknotesDb.put(banknoteTypeDb, userBanknoteAmountBindModel);
                 }
+                myCallback.onCallback(myBanknotesDb);
             }
 
             @Override
@@ -158,22 +190,6 @@ public class AddBanknotesActivity extends AppCompatActivity implements Banknotes
                 Log.wtf("onCancelledError", "loadPost:onCancelled", databaseError.toException());
             }
         });
-
-//        Query firebaseQuery = database.orderByChild("userId").equalTo(userId);
-//        firebaseQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-//                 //todo
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//                Log.wtf("onCancelledError", "loadPost:onCancelled", databaseError.toException());
-//            }
-//        });
-
     }
 
     @Override
