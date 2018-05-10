@@ -8,4 +8,6 @@
     <string name="amount">Amount:</string>
     <string name="return_date">Return date:</string>
     <string name="my_money">My money:</string>
+    <string name="loan_currency">Loan currency:</string>
+    <string name="submit">Submit</string>
 </resources>
