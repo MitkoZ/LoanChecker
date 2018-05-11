@@ -5,12 +5,27 @@ import java.util.Map;
 
 public class UserCurrencyBindModel {
 
-    public String userId;
-    public String currency;
+    private String userId;
+    private String currency;
 
     public UserCurrencyBindModel(String userId, String currency) {
         this.userId = userId;
         this.currency = currency;
     }
 
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
 }

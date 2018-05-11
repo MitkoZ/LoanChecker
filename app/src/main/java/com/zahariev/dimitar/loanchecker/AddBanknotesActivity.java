@@ -62,7 +62,7 @@ public class AddBanknotesActivity extends AppCompatActivity implements Banknotes
 
                 for (int i = 0; i < allUserCurrencyBindModelList.size(); i++) {
                     UserCurrencyBindModel currentUserCurrencyBindModel = allUserCurrencyBindModelList.get(i);
-                    if (currentUserCurrencyBindModel.userId.equals(Utils.googleAccount.getId())) {
+                    if (currentUserCurrencyBindModel.getUserId().equals(Utils.googleAccount.getId())) {
                         currentUserCurrencyBindModelList.add(currentUserCurrencyBindModel);
                     }
                 }
@@ -76,7 +76,7 @@ public class AddBanknotesActivity extends AppCompatActivity implements Banknotes
 
                 List<String> currencies = new ArrayList<>();
                 for (UserCurrencyBindModel userCurrencyBindModel : currentUserCurrencyBindModelList) {
-                    currencies.add(userCurrencyBindModel.currency);
+                    currencies.add(userCurrencyBindModel.getCurrency());
                 }
 
                 ViewGroup banknotesFragmentGridLayout = findViewById(R.id.banknotes_fragment_grid_layout);
@@ -125,9 +125,9 @@ public class AddBanknotesActivity extends AppCompatActivity implements Banknotes
         for (Map.Entry<String, Integer> programmaticallyAssignedIdEntry : Utils.programmaticallyAssignedIds.entrySet()) {
             EditText amountEditText = findViewById(programmaticallyAssignedIdEntry.getValue());
             UserBanknoteAmountBindModel userBanknoteAmountBindModel = new UserBanknoteAmountBindModel();
-            userBanknoteAmountBindModel.userId = Utils.googleAccount.getId();
-            userBanknoteAmountBindModel.banknoteType = programmaticallyAssignedIdEntry.getKey();
-            userBanknoteAmountBindModel.banknoteAmount = Integer.parseInt(amountEditText.getText().toString());
+            userBanknoteAmountBindModel.setUserId(Utils.googleAccount.getId());
+            userBanknoteAmountBindModel.setBanknoteType(programmaticallyAssignedIdEntry.getKey());
+            userBanknoteAmountBindModel.setBanknoteAmount(Integer.parseInt(amountEditText.getText().toString()));
             userBanknoteAmountBindModelList.add(userBanknoteAmountBindModel);
         }
         ISaveToDatabaseCallback saveToDatabaseCallback = new ISaveToDatabaseCallback() {
@@ -143,15 +143,15 @@ public class AddBanknotesActivity extends AppCompatActivity implements Banknotes
         DatabaseReference database = FirebaseDatabase.getInstance().getReference("userBanknoteAmount");
         for (final UserBanknoteAmountBindModel userBanknoteAmountBindModel :
                 userBanknoteAmountBindModelList) {
-            if (userBanknotesFromDatabase.containsKey(userBanknoteAmountBindModel.banknoteType)) {
+            if (userBanknotesFromDatabase.containsKey(userBanknoteAmountBindModel.getBanknoteType())) {
                 //update the record in the db
-                UserBanknoteAmountBindModel currentUserBanknoteFromDatabaseBindModel = userBanknotesFromDatabase.get((userBanknoteAmountBindModel.banknoteType));
-                currentUserBanknoteFromDatabaseBindModel.banknoteAmount = userBanknoteAmountBindModel.banknoteAmount;
+                UserBanknoteAmountBindModel currentUserBanknoteFromDatabaseBindModel = userBanknotesFromDatabase.get((userBanknoteAmountBindModel.getBanknoteType()));
+                currentUserBanknoteFromDatabaseBindModel.setBanknoteAmount(userBanknoteAmountBindModel.getBanknoteAmount());
                 UserBanknoteAmountBindModel userBanknoteAmountBindModelForDb = new UserBanknoteAmountBindModel();
-                userBanknoteAmountBindModelForDb.banknoteType = currentUserBanknoteFromDatabaseBindModel.banknoteType;
-                userBanknoteAmountBindModelForDb.userId = currentUserBanknoteFromDatabaseBindModel.userId;
-                userBanknoteAmountBindModelForDb.banknoteAmount = currentUserBanknoteFromDatabaseBindModel.banknoteAmount;
-                database.child(currentUserBanknoteFromDatabaseBindModel.id).setValue(userBanknoteAmountBindModelForDb);
+                userBanknoteAmountBindModelForDb.setBanknoteType(currentUserBanknoteFromDatabaseBindModel.getBanknoteType());
+                userBanknoteAmountBindModelForDb.setUserId(currentUserBanknoteFromDatabaseBindModel.getUserId());
+                userBanknoteAmountBindModelForDb.setBanknoteAmount(currentUserBanknoteFromDatabaseBindModel.getBanknoteAmount());
+                database.child(currentUserBanknoteFromDatabaseBindModel.getId()).setValue(userBanknoteAmountBindModelForDb);
             }
             //else {
             //make a new record in the db
@@ -177,10 +177,10 @@ public class AddBanknotesActivity extends AppCompatActivity implements Banknotes
                     String banknoteTypeDb = userBanknoteAmountSnapshot.child("banknoteType").getValue().toString();
                     int banknoteAmountDb = Integer.parseInt(userBanknoteAmountSnapshot.child("banknoteAmount").getValue().toString());
                     UserBanknoteAmountBindModel userBanknoteAmountBindModel = new UserBanknoteAmountBindModel();
-                    userBanknoteAmountBindModel.banknoteType = banknoteTypeDb;
-                    userBanknoteAmountBindModel.userId = userId;
-                    userBanknoteAmountBindModel.banknoteAmount = banknoteAmountDb;
-                    userBanknoteAmountBindModel.id = userBanknoteAmountSnapshot.getKey();
+                    userBanknoteAmountBindModel.setBanknoteType(banknoteTypeDb);
+                    userBanknoteAmountBindModel.setUserId(userId);
+                    userBanknoteAmountBindModel.setBanknoteAmount(banknoteAmountDb);
+                    userBanknoteAmountBindModel.setId(userBanknoteAmountSnapshot.getKey());
                     myBanknotesDb.put(banknoteTypeDb, userBanknoteAmountBindModel);
                 }
                 myCallback.onCallback(myBanknotesDb);

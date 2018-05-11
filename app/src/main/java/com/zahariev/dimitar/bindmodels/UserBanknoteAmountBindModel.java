@@ -1,12 +1,14 @@
 package com.zahariev.dimitar.bindmodels;
 
-public class UserBanknoteAmountBindModel {
-    public String id;
-    public String userId;
-    public String banknoteType;
-    public int banknoteAmount;
+import com.google.firebase.database.Exclude;
 
-    public UserBanknoteAmountBindModel(){
+public class UserBanknoteAmountBindModel {
+    private String id;
+    private String userId;
+    private String banknoteType;
+    private int banknoteAmount;
+
+    public UserBanknoteAmountBindModel() {
 
     }
 
@@ -32,5 +34,13 @@ public class UserBanknoteAmountBindModel {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 }

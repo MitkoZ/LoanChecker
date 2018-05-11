@@ -55,9 +55,9 @@ public class AddCurrencyActivity extends AppCompatActivity {
         for (int banknote : Utils.BANKNOTES) {
             UserBanknoteAmountBindModel userBanknoteAmountBindModel = new UserBanknoteAmountBindModel();
             String key = database.push().getKey();
-            userBanknoteAmountBindModel.userId = Utils.googleAccount.getId();
-            userBanknoteAmountBindModel.banknoteAmount = 0;
-            userBanknoteAmountBindModel.banknoteType = banknote + "_" + currency;
+            userBanknoteAmountBindModel.setUserId(Utils.googleAccount.getId());
+            userBanknoteAmountBindModel.setBanknoteAmount(0);
+            userBanknoteAmountBindModel.setBanknoteType(banknote + "_" + currency);
             userBanknoteAmountMap.put(key, userBanknoteAmountBindModel);
         }
         database.updateChildren(userBanknoteAmountMap);

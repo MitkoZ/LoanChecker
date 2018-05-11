@@ -1,13 +1,12 @@
 package com.zahariev.dimitar.loanchecker;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.Toast;
@@ -18,20 +17,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.zahariev.dimitar.bindmodels.BanknoteAmountAndBanknoteAmountTypeBindModel;
 import com.zahariev.dimitar.bindmodels.LoanBindModel;
 import com.zahariev.dimitar.bindmodels.UserBanknoteAmountBindModel;
-import com.zahariev.dimitar.bindmodels.UserCurrencyBindModel;
-import com.zahariev.dimitar.utils.Ref;
 import com.zahariev.dimitar.utils.Utils;
 
-import java.io.Console;
 import java.util.ArrayList;
-import java.util.Currency;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GiveALoanActivity extends AppCompatActivity {
 
@@ -107,17 +104,11 @@ public class GiveALoanActivity extends AppCompatActivity {
         Spinner spinner = findViewById(R.id.currencySpinner);
         String chosenCurrency = spinner.getSelectedItem().toString();
 
-        if (!checkIfThereIsEnoughMoney(chosenCurrency, moneyAmountToLoan)) {
-            Toast.makeText(this, "Not enough money", Toast.LENGTH_SHORT).show();
-            return;
-        }
-//
-//        saveLoanToDatabase(loanBindModel);
+        checkIfThereIsEnoughMoney(chosenCurrency, loanBindModel);
 
     }
 
-    //
-    private boolean checkIfThereIsEnoughMoney(final String chosenCurrency, final Integer moneyAmountToLoan) {//todo refactor
+    private void checkIfThereIsEnoughMoney(final String chosenCurrency, final LoanBindModel loanBindModel) {//todo refactor
         DatabaseReference database;
         database = FirebaseDatabase.getInstance().getReference();
         Query userBanknoteAmountQuery = database.child("userBanknoteAmount").orderByChild("userId").equalTo(Utils.googleAccount.getId());
@@ -128,44 +119,44 @@ public class GiveALoanActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<UserBanknoteAmountBindModel> userBanknoteAmountChosenCurrencyBindModelList = getChosenCurrencyBanknotes(parseUserBanknoteAmount(dataSnapshot), chosenCurrency);
-                getBankoteAmountAndBanknoteAmountType(userBanknoteAmountChosenCurrencyBindModelList);
                 LinkedHashMap<Integer, Integer> banknoteAmountTypeBanknoteAmountMap = getBankoteAmountAndBanknoteAmountType(userBanknoteAmountChosenCurrencyBindModelList);
-                boolean isEnoughMoney = isEnoughMoney(banknoteAmountTypeBanknoteAmountMap, moneyAmountToLoan);
+                boolean isEnoughMoney = isEnoughMoney(banknoteAmountTypeBanknoteAmountMap, loanBindModel.getAmount());
+
                 Log.wtf("enough money?", Boolean.toString(isEnoughMoney));
+                if (!isEnoughMoney) {
+                    Toast.makeText(getApplicationContext(), "Not enough money", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                saveLoanToDatabase(loanBindModel, chosenCurrency);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Log.wtf("onEnoughMoneyCancelled", "Is enough money query cancelled");
             }
 
         });
-        return false;
-
     }
 
     private boolean isEnoughMoney(LinkedHashMap<Integer, Integer> banknoteAmountTypeBanknoteAmountMap, Integer moneyAmountToLoan) {
-        Ref<LinkedHashMap<Integer, Integer>> changeNominalsMap = new Ref<LinkedHashMap<Integer, Integer>>(banknoteAmountTypeBanknoteAmountMap);
-        return isEnoughMoney(moneyAmountToLoan, moneyAmountToLoan, changeNominalsMap, changeNominalsMap.get().size() - 1);
-
+        LinkedHashMap<Integer, Integer> changeNominalsMap = new LinkedHashMap<Integer, Integer>(banknoteAmountTypeBanknoteAmountMap);
+        return isEnoughMoney(moneyAmountToLoan, changeNominalsMap, changeNominalsMap.size() - 1);
     }
 
-    private static boolean isEnoughMoney(int amountOriginal, int amount, Ref<LinkedHashMap<Integer, Integer>> changeNominalsMap, int j) {
+    private static boolean isEnoughMoney(int amount, LinkedHashMap<Integer, Integer> changeNominalsMap, int j) {
         if (j >= 0 && (Utils.getElementByIndex(changeNominalsMap, j) <= amount) && amount > 0) {
             int i = j;
             for (; i >= 0; i--) {
                 if (Utils.getElementByIndex(changeNominalsMap, i) > 0 &&
                         Utils.getKeyByIndex(changeNominalsMap, i) <= amount) {
-//                    int element = Utils.getElementByIndex(changeNominalsMap, i) + 1;
-//                    changeNominalsMap.get().put(Utils.getKeyByIndex(changeNominalsMap, i), element);
                     int key = Utils.getKeyByIndex(changeNominalsMap, i);
                     amount -= key;
-                    changeNominalsMap.get().put(key, Utils.getElementByIndex(changeNominalsMap, i) - 1);
+                    changeNominalsMap.put(key, Utils.getElementByIndex(changeNominalsMap, i) - 1);
                     break;
                 }
 
             }
-            return isEnoughMoney(amountOriginal, amount, changeNominalsMap, i);
+            return isEnoughMoney(amount, changeNominalsMap, i);
         } else if (amount == 0) {
             return true;
         } else {
@@ -204,10 +195,76 @@ public class GiveALoanActivity extends AppCompatActivity {
         return userBanknoteAmountBindModelList;
     }
 
+    private List<UserBanknoteAmountBindModel> parseUserBanknoteAmountWithKey(DataSnapshot dataSnapshot) {
+        List<UserBanknoteAmountBindModel> userBanknoteAmountBindModelList = new ArrayList<>();
+        for (DataSnapshot userBanknoteAmount : dataSnapshot.getChildren()) {
+            UserBanknoteAmountBindModel userBanknoteAmountBindModel = userBanknoteAmount.getValue(UserBanknoteAmountBindModel.class);
+            userBanknoteAmountBindModel.setId(userBanknoteAmount.getKey());
+            userBanknoteAmountBindModelList.add(userBanknoteAmountBindModel);
+        }
+        return userBanknoteAmountBindModelList;
+    }
 
-    private void saveLoanToDatabase(LoanBindModel loanBindModel) {
-        //todo
+    private void saveLoanToDatabase(final LoanBindModel loanBindModel, final String chosenCurrency) {
+        final DatabaseReference database;
+        database = FirebaseDatabase.getInstance().getReference();
+        final Query userBanknoteAmountQuery = database.child("userBanknoteAmount").orderByChild("userId").equalTo(Utils.googleAccount.getId());
 
+        userBanknoteAmountQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<UserBanknoteAmountBindModel> userBanknoteAmountChosenCurrencyBindModelList = getChosenCurrencyBanknotes(parseUserBanknoteAmountWithKey(dataSnapshot), chosenCurrency);
+                LinkedHashMap<String, BanknoteAmountAndBanknoteAmountTypeBindModel> banknoteAmountTypeBanknoteAmountMap = getBankoteAmountAndBanknoteAmountTypeWithKey(userBanknoteAmountChosenCurrencyBindModelList);
+                LinkedHashMap<String, BanknoteAmountAndBanknoteAmountTypeBindModel> linkedHashMapBindModel = getNewBanknotesAmount(banknoteAmountTypeBanknoteAmountMap, loanBindModel.getAmount());
+                for (String userBanknoteAmountKey : linkedHashMapBindModel.keySet()) {
+                    database.child("userBanknoteAmount").child(userBanknoteAmountKey).child("banknoteAmount").setValue(linkedHashMapBindModel.get(userBanknoteAmountKey).getBanknoteAmount());//todo fix it (not only to take the money but also to make a loan object in the database)
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.wtf("onSaveLoanCancelled", "Save Loan to database cancelled");
+            }
+
+        });
+
+    }
+
+
+    private LinkedHashMap<String, BanknoteAmountAndBanknoteAmountTypeBindModel> getBankoteAmountAndBanknoteAmountTypeWithKey(List<UserBanknoteAmountBindModel> userBanknoteAmountChosenCurrencyBindModelList) {
+        LinkedHashMap<String, BanknoteAmountAndBanknoteAmountTypeBindModel> banknoteAmountTypeBanknoteAmountMap = new LinkedHashMap<>();
+        for (UserBanknoteAmountBindModel userBanknoteAmountBindModel : userBanknoteAmountChosenCurrencyBindModelList) {
+            BanknoteAmountAndBanknoteAmountTypeBindModel banknoteAmountAndBanknoteAmountTypeBindModel = new BanknoteAmountAndBanknoteAmountTypeBindModel();
+            banknoteAmountAndBanknoteAmountTypeBindModel.setBanknoteAmountType(Integer.parseInt(userBanknoteAmountBindModel.getBanknoteType().split("_")[0]));
+            banknoteAmountAndBanknoteAmountTypeBindModel.setBanknoteAmount(userBanknoteAmountBindModel.getBanknoteAmount());
+            banknoteAmountTypeBanknoteAmountMap.put(userBanknoteAmountBindModel.getId(), banknoteAmountAndBanknoteAmountTypeBindModel);
+        }
+        return banknoteAmountTypeBanknoteAmountMap;
+
+    }
+
+    private LinkedHashMap<String, BanknoteAmountAndBanknoteAmountTypeBindModel> getNewBanknotesAmount(LinkedHashMap<String, BanknoteAmountAndBanknoteAmountTypeBindModel> banknoteAmountTypeBanknoteAmountMap, Integer moneyAmountToLoan) {
+        return getNewBanknotesAmount(moneyAmountToLoan, banknoteAmountTypeBanknoteAmountMap, banknoteAmountTypeBanknoteAmountMap.size() - 1);
+    }
+
+    private LinkedHashMap<String, BanknoteAmountAndBanknoteAmountTypeBindModel> getNewBanknotesAmount(int amount, LinkedHashMap<String, BanknoteAmountAndBanknoteAmountTypeBindModel> banknoteAmountTypeBanknoteAmountMap, int j) {
+        if (j >= 0 && (Utils.getBindModelElementByIndex(banknoteAmountTypeBanknoteAmountMap, j).getBanknoteAmount() <= amount) && amount > 0) {
+            int i = j;
+            for (; i >= 0; i--) {
+                if (Utils.getBindModelElementByIndex(banknoteAmountTypeBanknoteAmountMap, i).getBanknoteAmount() > 0 &&
+                        Utils.getBindModelElementByIndex(banknoteAmountTypeBanknoteAmountMap, i).getBanknoteAmountType() <= amount) {
+                    int banknoteAmountType = Utils.getBindModelElementByIndex(banknoteAmountTypeBanknoteAmountMap, i).getBanknoteAmountType();
+                    amount -= banknoteAmountType;
+                    Utils.getBindModelElementByIndex(banknoteAmountTypeBanknoteAmountMap, i).setBanknoteAmount(Utils.getBindModelElementByIndex(banknoteAmountTypeBanknoteAmountMap, i).getBanknoteAmount() - 1);
+                    break;
+                }
+
+            }
+            return getNewBanknotesAmount(amount, banknoteAmountTypeBanknoteAmountMap, i);
+        } else { //amount == 0
+            return banknoteAmountTypeBanknoteAmountMap;
+        }
     }
 
 }
