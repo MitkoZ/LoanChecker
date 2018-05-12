@@ -4,14 +4,14 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 public class LoanBindModel {
-    private String loanerName;
+    private String loaneeName;
     private int amount;
     private Calendar returnDate;
     private String userId;
     private String currency;
 
-    public LoanBindModel(String loanerName, int amount, Calendar returnDate, String userId, String currency) {
-        this.loanerName = loanerName;
+    public LoanBindModel(String loaneeName, int amount, Calendar returnDate, String userId, String currency) {
+        this.loaneeName = loaneeName;
         this.amount = amount;
         this.returnDate = returnDate;
         this.userId = userId;
@@ -30,8 +30,8 @@ public class LoanBindModel {
         this.amount = amount;
     }
 
-    public void setLoanerName(String loanerName) {
-        this.loanerName = loanerName;
+    public void setLoaneeName(String loanerName) {
+        this.loaneeName = loanerName;
     }
 
     public void setReturnDate(GregorianCalendar returnDate) {
@@ -47,8 +47,8 @@ public class LoanBindModel {
         // format {day}/{month}/year
     }
 
-    public String getLoanerName() {
-        return loanerName;
+    public String getLoaneeName() {
+        return loaneeName;
     }
 
     public String getCurrency() {

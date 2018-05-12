@@ -81,9 +81,9 @@ public class GiveALoanActivity extends AppCompatActivity {
 
     public void submitLoan(View view) {
         EditText loanerNameEditText = findViewById(R.id.loanerName);
-        String loanerName = loanerNameEditText.getText().toString();
-        if (loanerName.equals("")) {
-            Toast.makeText(this, "Please enter a valid loaner name", Toast.LENGTH_SHORT).show();
+        String loaneeName = loanerNameEditText.getText().toString();
+        if (loaneeName.equals("")) {
+            Toast.makeText(this, "Please enter a valid loanee name", Toast.LENGTH_SHORT).show();
             return;
         }
         EditText moneyAmountToLoanEditText = findViewById(R.id.moneyAmountToLoan);
@@ -108,7 +108,7 @@ public class GiveALoanActivity extends AppCompatActivity {
         Spinner spinner = findViewById(R.id.currencySpinner);
         String chosenCurrency = spinner.getSelectedItem().toString();
 
-        LoanBindModel loanBindModel = new LoanBindModel(loanerName, moneyAmountToLoan, returnDate, Utils.googleAccount.getId(), chosenCurrency);
+        LoanBindModel loanBindModel = new LoanBindModel(loaneeName, moneyAmountToLoan, returnDate, Utils.googleAccount.getId(), chosenCurrency);
 
         processData(chosenCurrency, loanBindModel);
 
