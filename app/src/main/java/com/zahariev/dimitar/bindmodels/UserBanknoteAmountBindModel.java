@@ -1,7 +1,5 @@
 package com.zahariev.dimitar.bindmodels;
 
-import com.google.firebase.database.Exclude;
-
 public class UserBanknoteAmountBindModel {
     private String id;
     private String userId;

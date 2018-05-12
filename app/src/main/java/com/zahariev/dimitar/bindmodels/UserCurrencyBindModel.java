@@ -1,8 +1,5 @@
 package com.zahariev.dimitar.bindmodels;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class UserCurrencyBindModel {
 
     private String userId;
