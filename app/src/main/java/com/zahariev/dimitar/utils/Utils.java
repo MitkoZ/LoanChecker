@@ -13,7 +13,8 @@ import static java.util.Arrays.asList;
 public abstract class Utils {
     public static GoogleSignInAccount googleAccount;
     public static final List<Integer> BANKNOTES = asList(5, 10, 20, 50, 100);
-    public static HashMap<String, Integer> programmaticallyAssignedIds = new HashMap<>();
+    public static HashMap<String, Integer> banknotesProgrammaticallyAssignedIds = new HashMap<>();
+    public static HashMap<Integer, String> loansProgrammaticallyAssignedIds = new HashMap<>();
 
     public static int getElementByIndex(LinkedHashMap<Integer, Integer> map, int index) {
         return map.get((map.keySet().toArray())[index]);
@@ -41,5 +42,15 @@ public abstract class Utils {
         String[] integerArray = Arrays.copyOfRange(objectArray, 0, objectArray.length, String[].class);
         return integerArray;
     }
+
+    public static int[] stringArrayToIntArray(String[] stringArray) {
+        int[] intArray = new int[stringArray.length];
+        for (int i = 0; i < stringArray.length; i++) {
+            intArray[i] = Integer.parseInt(stringArray[i]);
+        }
+
+        return intArray;
+    }
+
 }
 

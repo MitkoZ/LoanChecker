@@ -1,7 +1,6 @@
 package com.zahariev.dimitar.loanchecker;
 
 import android.content.Intent;
-import android.media.JetPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -95,5 +94,10 @@ public class MyMoneyActivity extends AppCompatActivity {
     public void giveALoan(View view) {
         Intent giveALoanIntent = new Intent(this, GiveALoanActivity.class);
         startActivity(giveALoanIntent);
+    }
+
+    public void getAvailableLoans(View view) {
+        Intent getAvailableLoansIntent = new Intent(this, GivenLoansDropdownActivity.class);
+        startActivity(getAvailableLoansIntent);
     }
 }

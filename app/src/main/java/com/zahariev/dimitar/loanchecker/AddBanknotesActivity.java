@@ -85,7 +85,7 @@ public class AddBanknotesActivity extends AppCompatActivity implements Banknotes
                         EditText amountEditText = new EditText(getApplicationContext());
                         amountEditText.setId(View.generateViewId());
                         amountEditText.setText("0");// default banknote amount is 0
-                        Utils.programmaticallyAssignedIds.put(banknote + "_" + currency, amountEditText.getId());
+                        Utils.banknotesProgrammaticallyAssignedIds.put(banknote + "_" + currency, amountEditText.getId());
                         banknotesFragmentGridLayout.addView(amountEditText);
                         TextView amountBanknotesTextView = new TextView(getApplicationContext());
                         amountBanknotesTextView.setText(MessageFormat.format("x {0} {1}", banknote, currency));
@@ -122,7 +122,7 @@ public class AddBanknotesActivity extends AppCompatActivity implements Banknotes
 
     private void submitMyData(View view) {
         final List<UserBanknoteAmountBindModel> userBanknoteAmountBindModelList = new ArrayList<>();
-        for (Map.Entry<String, Integer> programmaticallyAssignedIdEntry : Utils.programmaticallyAssignedIds.entrySet()) {
+        for (Map.Entry<String, Integer> programmaticallyAssignedIdEntry : Utils.banknotesProgrammaticallyAssignedIds.entrySet()) {
             EditText amountEditText = findViewById(programmaticallyAssignedIdEntry.getValue());
             UserBanknoteAmountBindModel userBanknoteAmountBindModel = new UserBanknoteAmountBindModel();
             userBanknoteAmountBindModel.setUserId(Utils.googleAccount.getId());

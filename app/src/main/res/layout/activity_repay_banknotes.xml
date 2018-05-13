@@ -5,13 +5,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="16dp"
-    tools:context=".AddBanknotesActivity">
+    tools:context=".RepayBanknotesActivity">
 
     <fragment
-        android:id="@+id/banknotes_fragment"
+        android:id="@+id/repayBanknotesFragment"
         android:name="com.zahariev.dimitar.loanchecker.BanknotesFragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
+
     </fragment>
 </LinearLayout>

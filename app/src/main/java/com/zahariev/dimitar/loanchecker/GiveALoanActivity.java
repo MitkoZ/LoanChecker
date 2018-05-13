@@ -60,7 +60,9 @@ public class GiveALoanActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.w("onCurrenciesCancelled", "loadPossibleCurrencies:onCancelled", databaseError.toException());
+                Toast.makeText(GiveALoanActivity.this, "Could not load data", Toast.LENGTH_LONG).show();
             }
+            
         });
 
     }
@@ -111,7 +113,8 @@ public class GiveALoanActivity extends AppCompatActivity {
         LoanBindModel loanBindModel = new LoanBindModel(loaneeName, moneyAmountToLoan, returnDate, Utils.googleAccount.getId(), chosenCurrency);
 
         processData(chosenCurrency, loanBindModel);
-
+        finish();
+        Toast.makeText(GiveALoanActivity.this, "Loan saved successfully!", Toast.LENGTH_SHORT).show();
     }
 
     private void processData(final String chosenCurrency, final LoanBindModel loanBindModel) {

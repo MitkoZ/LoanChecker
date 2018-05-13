@@ -19,7 +19,13 @@
         <activity android:name=".MyMoneyActivity" />
         <activity android:name=".AddBanknotesActivity" />
         <activity android:name=".AddCurrencyActivity" />
-        <activity android:name=".GiveALoanActivity"></activity>
+        <activity android:name=".GiveALoanActivity" />
+        <activity
+            android:name=".GivenLoansDropdownActivity"
+            android:label="@string/title_activity_loans"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".CheckALoanActivity" />
+        <activity android:name=".RepayBanknotesActivity"></activity>
     </application>
 
 </manifest>

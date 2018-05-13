@@ -44,4 +44,12 @@
         android:layout_height="wrap_content"
         android:onClick="giveALoan"
         android:text="Give a loan" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Loan collector"
+        android:onClick="getAvailableLoans"
+        />
 </LinearLayout>
