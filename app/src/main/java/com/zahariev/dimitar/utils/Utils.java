@@ -4,6 +4,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.zahariev.dimitar.bindmodels.BanknoteAmountAndBanknoteAmountTypeBindModel;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -50,6 +51,23 @@ public abstract class Utils {
         }
 
         return intArray;
+    }
+
+
+    public interface Predicate<T> {
+        boolean contains(T item);
+    }
+
+    public static class CollectionUtil {
+
+        public static <T> T find(final Collection<T> collection, final Predicate<T> predicate) {
+            for (T item : collection) {
+                if (predicate.contains(item)) {
+                    return item;
+                }
+            }
+            return null;
+        }
     }
 
 }

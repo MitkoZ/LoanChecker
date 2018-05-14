@@ -74,7 +74,6 @@ public class CheckALoanActivity extends AppCompatActivity {
                         startActivity(repayBanknotesIntent);
                     }
                 });
-                checkALoanLinearLayout.setOrientation(LinearLayout.VERTICAL);
                 checkALoanLinearLayout.addView(loaneeTextView);
                 checkALoanLinearLayout.addView(amountTextView);
                 checkALoanLinearLayout.addView(returnDateDatePicker);

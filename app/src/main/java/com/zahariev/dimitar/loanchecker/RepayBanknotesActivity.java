@@ -2,8 +2,8 @@ package com.zahariev.dimitar.loanchecker;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
@@ -22,8 +22,6 @@ import com.zahariev.dimitar.bindmodels.BanknoteAmountAndBanknoteAmountTypeBindMo
 import com.zahariev.dimitar.bindmodels.UserBanknoteAmountBindModel;
 import com.zahariev.dimitar.utils.Utils;
 
-import junit.framework.Test;
-
 import java.text.MessageFormat;
 import java.util.HashMap;
 
@@ -41,6 +39,7 @@ public class RepayBanknotesActivity extends AppCompatActivity implements Banknot
         final String userGivenLoanId = getIntent().getExtras().get("userGivenLoanId").toString();
         for (Integer possibleBanknote : Utils.BANKNOTES) {
             EditText banknoteAmountEditText = new EditText(getApplicationContext());
+            banknoteAmountEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
             banknoteAmountEditText.setText("0");
             int id = View.generateViewId();
             banknotesProgrammaticallyAssignedIds.put(MessageFormat.format("{0}_{1}", possibleBanknote, currency), id);
@@ -51,7 +50,7 @@ public class RepayBanknotesActivity extends AppCompatActivity implements Banknot
             gridLayout.addView(currencyTextView);
         }
         Button repayButton = new Button(getApplicationContext());
-        repayButton.setText("Repay");
+        repayButton.setText(R.string.repay);
         repayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,7 +59,7 @@ public class RepayBanknotesActivity extends AppCompatActivity implements Banknot
 
         });
         Button cancelButton = new Button(getApplicationContext());
-        cancelButton.setText("Cancel");
+        cancelButton.setText(R.string.cancel);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -72,7 +71,7 @@ public class RepayBanknotesActivity extends AppCompatActivity implements Banknot
         gridLayout.addView(cancelButton);
     }
 
-    private void repayLoan(Integer loanMoney, String userGivenLoanId, String currency) {//todo validate money input
+    private void repayLoan(Integer loanMoney, String userGivenLoanId, String currency) {
         HashMap<Integer, Integer> moneyAmountMap = new HashMap<>();
         for (String banknoteProgrammaticalyAssignedIdKey : banknotesProgrammaticallyAssignedIds.keySet()) {
             EditText moneyAmountEditText = findViewById(banknotesProgrammaticallyAssignedIds.get(banknoteProgrammaticalyAssignedIdKey));

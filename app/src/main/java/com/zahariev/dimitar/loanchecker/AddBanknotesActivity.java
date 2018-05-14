@@ -3,6 +3,7 @@ package com.zahariev.dimitar.loanchecker;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,11 +47,6 @@ public class AddBanknotesActivity extends AppCompatActivity implements Banknotes
         ValueEventListener currencyListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-//                if (dataSnapshot.getValue() == null) {
-//                    Toast.makeText(getApplicationContext(), "You don't have any added currencies", Toast.LENGTH_LONG).show();
-//                    finish();
-//                    return;
-//                }
 
                 List<UserCurrencyBindModel> currentUserCurrencyBindModelList = new ArrayList<>();
 
@@ -76,6 +72,7 @@ public class AddBanknotesActivity extends AppCompatActivity implements Banknotes
 
                             UserBanknoteAmountBindModel userBanknoteAmountBindModel = banknoteAmount.getValue(UserBanknoteAmountBindModel.class);
                             EditText amountEditText = new EditText(getApplicationContext());
+                            amountEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
                             amountEditText.setId(View.generateViewId());
                             amountEditText.setText(Integer.toString(userBanknoteAmountBindModel.getBanknoteAmount()));
                             Utils.banknotesProgrammaticallyAssignedIds.put(userBanknoteAmountBindModel.getBanknoteType(), amountEditText.getId());

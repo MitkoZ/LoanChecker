@@ -6,7 +6,8 @@
     <ScrollView
         android:id="@+id/loansActivityScrollView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        >
 
     </ScrollView>
 </LinearLayout>
