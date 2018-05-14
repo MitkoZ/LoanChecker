@@ -10,6 +10,10 @@ public class UserCurrencyBindModel {
         this.currency = currency;
     }
 
+    public  UserCurrencyBindModel(){
+
+    }
+
     public void setUserId(String userId) {
         this.userId = userId;
     }

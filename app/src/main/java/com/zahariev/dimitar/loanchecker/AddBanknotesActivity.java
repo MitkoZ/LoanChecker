@@ -19,7 +19,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.zahariev.dimitar.bindmodels.UserBanknoteAmountBindModel;
 import com.zahariev.dimitar.bindmodels.UserCurrencyBindModel;
-import com.zahariev.dimitar.utils.ISaveToDatabaseCallback;
+import com.zahariev.dimitar.utils.ISaveBanknotesToDatabaseCallback;
 import com.zahariev.dimitar.utils.Utils;
 
 import java.text.MessageFormat;
@@ -40,33 +40,25 @@ public class AddBanknotesActivity extends AppCompatActivity implements Banknotes
     protected void onStart() {
         super.onStart();
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference databaseReference = database.getReference("/userCurrencies/");
-
-        ValueEventListener postListener = new ValueEventListener() {
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference databaseUserCurrenciesReference = database.getReference("/userCurrencies/");
+        Query currencyQuery = databaseUserCurrenciesReference.orderByChild("userId").equalTo(Utils.googleAccount.getId());
+        ValueEventListener currencyListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue() == null) {
-                    Toast.makeText(getApplicationContext(), "You don't have any added currencies", Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                List<UserCurrencyBindModel> allUserCurrencyBindModelList = new ArrayList<>();
-                HashMap<String, String> userCurrencyHashMap;
-                for (DataSnapshot userCurrencySnapshot : dataSnapshot.getChildren()) {
-                    userCurrencyHashMap = (HashMap<String, String>) userCurrencySnapshot.getValue();
-                    allUserCurrencyBindModelList.add(new UserCurrencyBindModel(userCurrencyHashMap.get("userId"), userCurrencyHashMap.get("currency")));
-                }
+//                if (dataSnapshot.getValue() == null) {
+//                    Toast.makeText(getApplicationContext(), "You don't have any added currencies", Toast.LENGTH_LONG).show();
+//                    finish();
+//                    return;
+//                }
 
                 List<UserCurrencyBindModel> currentUserCurrencyBindModelList = new ArrayList<>();
 
-                for (int i = 0; i < allUserCurrencyBindModelList.size(); i++) {
-                    UserCurrencyBindModel currentUserCurrencyBindModel = allUserCurrencyBindModelList.get(i);
-                    if (currentUserCurrencyBindModel.getUserId().equals(Utils.googleAccount.getId())) {
-                        currentUserCurrencyBindModelList.add(currentUserCurrencyBindModel);
-                    }
+                for (DataSnapshot userCurrencyWithKey :
+                        dataSnapshot.getChildren()) {
+                    UserCurrencyBindModel userCurrencyBindModel = userCurrencyWithKey.getValue(UserCurrencyBindModel.class);
+                    currentUserCurrencyBindModelList.add(userCurrencyBindModel);
                 }
-
 
                 if (currentUserCurrencyBindModelList.isEmpty()) {
                     Toast.makeText(getApplicationContext(), "You don't have any added currencies", Toast.LENGTH_LONG).show();
@@ -74,50 +66,65 @@ public class AddBanknotesActivity extends AppCompatActivity implements Banknotes
                     return;
                 }
 
-                List<String> currencies = new ArrayList<>();
-                for (UserCurrencyBindModel userCurrencyBindModel : currentUserCurrencyBindModelList) {
-                    currencies.add(userCurrencyBindModel.getCurrency());
-                }
+                DatabaseReference databaseReference = database.getReference("userBanknoteAmount");
+                Query banknotesAmountQuery = databaseReference.orderByChild("userId").equalTo(Utils.googleAccount.getId());
+                ValueEventListener banknotesListener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        ViewGroup banknotesFragmentGridLayout = findViewById(R.id.banknotes_fragment_grid_layout);
+                        for (DataSnapshot banknoteAmount : dataSnapshot.getChildren()) {
 
-                ViewGroup banknotesFragmentGridLayout = findViewById(R.id.banknotes_fragment_grid_layout);
-                for (String currency : currencies) {
-                    for (int banknote : Utils.BANKNOTES) {
-                        EditText amountEditText = new EditText(getApplicationContext());
-                        amountEditText.setId(View.generateViewId());
-                        amountEditText.setText("0");// default banknote amount is 0
-                        Utils.banknotesProgrammaticallyAssignedIds.put(banknote + "_" + currency, amountEditText.getId());
-                        banknotesFragmentGridLayout.addView(amountEditText);
-                        TextView amountBanknotesTextView = new TextView(getApplicationContext());
-                        amountBanknotesTextView.setText(MessageFormat.format("x {0} {1}", banknote, currency));
-                        banknotesFragmentGridLayout.addView(amountBanknotesTextView);
+                            UserBanknoteAmountBindModel userBanknoteAmountBindModel = banknoteAmount.getValue(UserBanknoteAmountBindModel.class);
+                            EditText amountEditText = new EditText(getApplicationContext());
+                            amountEditText.setId(View.generateViewId());
+                            amountEditText.setText(Integer.toString(userBanknoteAmountBindModel.getBanknoteAmount()));
+                            Utils.banknotesProgrammaticallyAssignedIds.put(userBanknoteAmountBindModel.getBanknoteType(), amountEditText.getId());
+                            banknotesFragmentGridLayout.addView(amountEditText);
+                            TextView amountBanknotesTextView = new TextView(getApplicationContext());
+                            String[] banknoteType = userBanknoteAmountBindModel.getBanknoteType().split("_");
+                            amountBanknotesTextView.setText(MessageFormat.format("x {0} {1}", banknoteType[0], banknoteType[1]));
+                            banknotesFragmentGridLayout.addView(amountBanknotesTextView);
+                        }
+
+                        Button submitButton = new Button(getApplicationContext());
+                        submitButton.setText(R.string.submit);
+                        submitButton.setOnClickListener(new Button.OnClickListener() {
+                            public void onClick(View v) {
+                                submitMyData(v);
+                            }
+                        });
+                        Button cancelButton = new Button(getApplicationContext());
+                        cancelButton.setText(R.string.cancel);
+                        cancelButton.setOnClickListener(new Button.OnClickListener() {
+                            public void onClick(View v) {
+                                finish();
+                            }
+                        });
+                        banknotesFragmentGridLayout.addView(submitButton);
+                        banknotesFragmentGridLayout.addView(cancelButton);
                     }
-                }
-                Button submitButton = new Button(getApplicationContext());
-                submitButton.setText("Submit");
-                submitButton.setOnClickListener(new Button.OnClickListener() {
-                    public void onClick(View v) {
-                        submitMyData(v);
-                    }
-                });
-                Button cancelButton = new Button(getApplicationContext());
-                cancelButton.setText("Cancel");
-                cancelButton.setOnClickListener(new Button.OnClickListener() {
-                    public void onClick(View v) {
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.wtf("", "Could not load userBanknoteAmount data");
+                        Toast.makeText(AddBanknotesActivity.this, "Banknotes data could not be loaded", Toast.LENGTH_LONG).show();
                         finish();
                     }
-                });
-                banknotesFragmentGridLayout.addView(submitButton);
-                banknotesFragmentGridLayout.addView(cancelButton);
+
+                };
+
+                banknotesAmountQuery.addListenerForSingleValueEvent(banknotesListener);
             }
 
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.w("onCalledError", "loadPost:onCancelled", databaseError.toException());
+                Toast.makeText(AddBanknotesActivity.this, "Loading currencies failed", Toast.LENGTH_SHORT).show();
             }
-
         };
-        databaseReference.addValueEventListener(postListener);
+
+        currencyQuery.addValueEventListener(currencyListener);
     }
 
     private void submitMyData(View view) {
@@ -127,50 +134,56 @@ public class AddBanknotesActivity extends AppCompatActivity implements Banknotes
             UserBanknoteAmountBindModel userBanknoteAmountBindModel = new UserBanknoteAmountBindModel();
             userBanknoteAmountBindModel.setUserId(Utils.googleAccount.getId());
             userBanknoteAmountBindModel.setBanknoteType(programmaticallyAssignedIdEntry.getKey());
-            userBanknoteAmountBindModel.setBanknoteAmount(Integer.parseInt(amountEditText.getText().toString()));
+            int moneyAmount;
+            try {
+                moneyAmount = Integer.parseInt(amountEditText.getText().toString());
+            } catch (NumberFormatException numberFormatException) {
+                Toast.makeText(getApplicationContext(), "Please enter a valid money amount", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            if (moneyAmount < 0) {
+                Toast.makeText(getApplicationContext(), "Please enter a valid money amount", Toast.LENGTH_LONG).show();
+                return;
+            }
+            userBanknoteAmountBindModel.setBanknoteAmount(moneyAmount);
             userBanknoteAmountBindModelList.add(userBanknoteAmountBindModel);
         }
-        ISaveToDatabaseCallback saveToDatabaseCallback = new ISaveToDatabaseCallback() {
+
+        ISaveBanknotesToDatabaseCallback saveBanknotesToDatabaseCallback = new ISaveBanknotesToDatabaseCallback() {
             @Override
             public void onCallback(HashMap<String, UserBanknoteAmountBindModel> myBanknotesFromDb) {
                 saveDataToDatabase(userBanknoteAmountBindModelList, myBanknotesFromDb);
             }
         };
-        getUserBanknotesFromDatabase(Utils.googleAccount.getId(), saveToDatabaseCallback);
+        getUserBanknotesFromDatabase(Utils.googleAccount.getId(), saveBanknotesToDatabaseCallback);
     }
 
     private void saveDataToDatabase(List<UserBanknoteAmountBindModel> userBanknoteAmountBindModelList, HashMap<String, UserBanknoteAmountBindModel> userBanknotesFromDatabase) {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference("userBanknoteAmount");
         for (final UserBanknoteAmountBindModel userBanknoteAmountBindModel :
                 userBanknoteAmountBindModelList) {
-            if (userBanknotesFromDatabase.containsKey(userBanknoteAmountBindModel.getBanknoteType())) {
-                //update the record in the db
-                UserBanknoteAmountBindModel currentUserBanknoteFromDatabaseBindModel = userBanknotesFromDatabase.get((userBanknoteAmountBindModel.getBanknoteType()));
-                currentUserBanknoteFromDatabaseBindModel.setBanknoteAmount(userBanknoteAmountBindModel.getBanknoteAmount());
-                UserBanknoteAmountBindModel userBanknoteAmountBindModelForDb = new UserBanknoteAmountBindModel();
-                userBanknoteAmountBindModelForDb.setBanknoteType(currentUserBanknoteFromDatabaseBindModel.getBanknoteType());
-                userBanknoteAmountBindModelForDb.setUserId(currentUserBanknoteFromDatabaseBindModel.getUserId());
-                userBanknoteAmountBindModelForDb.setBanknoteAmount(currentUserBanknoteFromDatabaseBindModel.getBanknoteAmount());
-                database.child(currentUserBanknoteFromDatabaseBindModel.getId()).setValue(userBanknoteAmountBindModelForDb);
-            }
-            //else {
-            //make a new record in the db
-//                String key = database.push().getKey();
-//                Map<String, Object> userBanknoteAmountMap = new HashMap<>();
-//                userBanknoteAmountMap.put(key, userBanknoteAmountBindModel);
-//                database.updateChildren(userBanknoteAmountMap);
-            //}
+            //update the record in the db
+            UserBanknoteAmountBindModel currentUserBanknoteFromDatabaseBindModel = userBanknotesFromDatabase.get((userBanknoteAmountBindModel.getBanknoteType()));
+            currentUserBanknoteFromDatabaseBindModel.setBanknoteAmount(userBanknoteAmountBindModel.getBanknoteAmount());
+            UserBanknoteAmountBindModel userBanknoteAmountBindModelForDb = new UserBanknoteAmountBindModel();
+            userBanknoteAmountBindModelForDb.setBanknoteType(currentUserBanknoteFromDatabaseBindModel.getBanknoteType());
+            userBanknoteAmountBindModelForDb.setUserId(currentUserBanknoteFromDatabaseBindModel.getUserId());
+            userBanknoteAmountBindModelForDb.setBanknoteAmount(currentUserBanknoteFromDatabaseBindModel.getBanknoteAmount());
+            database.child(currentUserBanknoteFromDatabaseBindModel.getId()).setValue(userBanknoteAmountBindModelForDb);
 
         }
+        Toast.makeText(getApplicationContext(), "Banknotes saved successfully!", Toast.LENGTH_LONG).show();
+        finish();
     }
 
-    private void getUserBanknotesFromDatabase(final String userId, final ISaveToDatabaseCallback myCallback) {
+    private void getUserBanknotesFromDatabase(final String userId, final ISaveBanknotesToDatabaseCallback myCallback) {
 
         DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
         DatabaseReference userBanknoteAmountRef = rootRef.child("userBanknoteAmount");
-        Query firebaseQuery = userBanknoteAmountRef.orderByChild("userId").equalTo(userId);
+        Query userBanknoteAmountQuery = userBanknoteAmountRef.orderByChild("userId").equalTo(userId);
         final HashMap<String, UserBanknoteAmountBindModel> myBanknotesDb = new HashMap<>();
-        firebaseQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+        userBanknoteAmountQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot userBanknoteAmountSnapshot : dataSnapshot.getChildren()) {
@@ -188,12 +201,15 @@ public class AddBanknotesActivity extends AppCompatActivity implements Banknotes
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.wtf("onCancelledError", "loadPost:onCancelled", databaseError.toException());
+                Log.wtf("onCancelledError", "userBanknoteAmountQuery:onCancelled", databaseError.toException());
+                Toast.makeText(AddBanknotesActivity.this, "Could not load the banknotes data", Toast.LENGTH_LONG).show();
             }
+
         });
     }
 
     @Override
     public void onFragmentInteraction(Uri uri) {
+
     }
 }

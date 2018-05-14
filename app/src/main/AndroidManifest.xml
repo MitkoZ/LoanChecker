@@ -16,7 +16,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MyMoneyActivity" />
+        <activity android:name=".MainActivity" />
         <activity android:name=".AddBanknotesActivity" />
         <activity android:name=".AddCurrencyActivity" />
         <activity android:name=".GiveALoanActivity" />

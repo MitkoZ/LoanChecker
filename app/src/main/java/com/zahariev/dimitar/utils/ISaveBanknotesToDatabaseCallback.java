@@ -4,6 +4,6 @@ import com.zahariev.dimitar.bindmodels.UserBanknoteAmountBindModel;
 
 import java.util.HashMap;
 
-public interface ISaveToDatabaseCallback {
+public interface ISaveBanknotesToDatabaseCallback {
     void onCallback(HashMap<String, UserBanknoteAmountBindModel> myBanknotesDb);
 }

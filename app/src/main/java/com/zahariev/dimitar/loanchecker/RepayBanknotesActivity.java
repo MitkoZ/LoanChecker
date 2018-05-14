@@ -76,7 +76,18 @@ public class RepayBanknotesActivity extends AppCompatActivity implements Banknot
         HashMap<Integer, Integer> moneyAmountMap = new HashMap<>();
         for (String banknoteProgrammaticalyAssignedIdKey : banknotesProgrammaticallyAssignedIds.keySet()) {
             EditText moneyAmountEditText = findViewById(banknotesProgrammaticallyAssignedIds.get(banknoteProgrammaticalyAssignedIdKey));
-            Integer money = Integer.parseInt(moneyAmountEditText.getText().toString());
+            Integer money;
+            try {
+                money = Integer.parseInt(moneyAmountEditText.getText().toString());
+            } catch (NumberFormatException numberFormatException) {
+                Toast.makeText(this, "Please enter a valid amount of money", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (money < 0) {
+                Toast.makeText(this, "Please enter a valid amount of money", Toast.LENGTH_SHORT).show();
+                return;
+            }
             moneyAmountMap.put(Integer.parseInt(banknoteProgrammaticalyAssignedIdKey.split("_")[0]), money);
         }
         int totalInputMoney = getTotalMoneyFromBanknotes(moneyAmountMap);

@@ -51,8 +51,13 @@ public class GiveALoanActivity extends AppCompatActivity {
         userPossibleCurrenciesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                List<String> possibleCurrenciesDropdown = parseCurrencyData(dataSnapshot);
-                SpinnerAdapter spinnerAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, possibleCurrenciesDropdown);
+                List<String> possibleCurrenciesList = parseCurrencyData(dataSnapshot);
+                if (possibleCurrenciesList.isEmpty()) {
+                    Toast.makeText(GiveALoanActivity.this, "You don't have any currencies added", Toast.LENGTH_SHORT).show();
+                    finish();
+                    return;
+                }
+                SpinnerAdapter spinnerAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, possibleCurrenciesList);
                 Spinner dropdown = findViewById(R.id.currencySpinner);
                 dropdown.setAdapter(spinnerAdapter);
             }
@@ -62,7 +67,7 @@ public class GiveALoanActivity extends AppCompatActivity {
                 Log.w("onCurrenciesCancelled", "loadPossibleCurrencies:onCancelled", databaseError.toException());
                 Toast.makeText(GiveALoanActivity.this, "Could not load data", Toast.LENGTH_LONG).show();
             }
-            
+
         });
 
     }
@@ -114,7 +119,6 @@ public class GiveALoanActivity extends AppCompatActivity {
 
         processData(chosenCurrency, loanBindModel);
         finish();
-        Toast.makeText(GiveALoanActivity.this, "Loan saved successfully!", Toast.LENGTH_SHORT).show();
     }
 
     private void processData(final String chosenCurrency, final LoanBindModel loanBindModel) {
@@ -133,7 +137,7 @@ public class GiveALoanActivity extends AppCompatActivity {
 
                 Log.wtf("enough money?", Boolean.toString(isEnoughMoney));
                 if (!isEnoughMoney) {
-                    Toast.makeText(getApplicationContext(), "Not enough money", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Not enough money or banknotes", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 saveLoanToDatabase(loanBindModel, chosenCurrency);
@@ -248,6 +252,7 @@ public class GiveALoanActivity extends AppCompatActivity {
         Map<String, Object> loanBindModelMap = new HashMap<>();
         loanBindModelMap.put(idDb, loanBindModel);
         database.updateChildren(loanBindModelMap);
+        Toast.makeText(this, "Loan saved successfully!", Toast.LENGTH_SHORT).show();
     }
 
 

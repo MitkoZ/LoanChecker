@@ -53,6 +53,12 @@ public class GivenLoansDropdownActivity extends AppCompatActivity {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue() == null) {
+                    Toast.makeText(GivenLoansDropdownActivity.this, "You haven't given any loans", Toast.LENGTH_SHORT).show();
+                    finish();
+                    return;
+                }
+
                 for (final DataSnapshot givenLoan :
                         dataSnapshot.getChildren()) {
                     final LoanBindModel loanBindModel = givenLoan.getValue(LoanBindModel.class);

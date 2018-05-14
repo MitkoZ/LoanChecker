@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -20,12 +21,12 @@ import com.zahariev.dimitar.utils.Utils;
 import java.text.MessageFormat;
 import java.util.HashMap;
 
-public class MyMoneyActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my_money);
+        setContentView(R.layout.activity_main_activity);
         if (Utils.googleAccount != null) {
             String personName = Utils.googleAccount.getDisplayName();
             TextView userGreetingsView = findViewById(R.id.user_greetings_view);
@@ -44,15 +45,12 @@ public class MyMoneyActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.w("CancelledMoneyListener", "moneyListener:onCancelled", databaseError.toException());
+                Toast.makeText(getApplicationContext(), "Could not load money data", Toast.LENGTH_LONG);
             }
+
         };
         allBanknotesOfAUserQuery.addValueEventListener(moneyListener);
 
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
     }
 
     private void updateMyMoney(DataSnapshot dataSnapshot) {
@@ -71,12 +69,12 @@ public class MyMoneyActivity extends AppCompatActivity {
             }
         }
 
-        ViewGroup myMoneyLayout = findViewById(R.id.my_money_layout);
+        TextView myMoneyTextView = findViewById(R.id.my_money_text_view);
+        myMoneyTextView.setText(R.string.my_money);
         for (String moneyAmountKey :
                 moneyHashMap.keySet()) {
-            TextView moneyTextView = new TextView(getApplicationContext());
-            moneyTextView.setText(MessageFormat.format(" {0} {1}s", moneyHashMap.get(moneyAmountKey), moneyAmountKey));
-            myMoneyLayout.addView(moneyTextView);
+            String myMoneyCurrentText = myMoneyTextView.getText().toString();
+            myMoneyTextView.setText(MessageFormat.format(" {0} {1} {2}s", myMoneyCurrentText, moneyHashMap.get(moneyAmountKey), moneyAmountKey));
         }
 
     }
@@ -87,8 +85,8 @@ public class MyMoneyActivity extends AppCompatActivity {
     }
 
     public void addCurrency(View view) {
-        Intent addPossibleCurrenciesItent = new Intent(this, AddCurrencyActivity.class);
-        startActivity(addPossibleCurrenciesItent);
+        Intent addPossibleCurrenciesIntent = new Intent(this, AddCurrencyActivity.class);
+        startActivity(addPossibleCurrenciesIntent);
     }
 
     public void giveALoan(View view) {

@@ -16,40 +16,37 @@
         android:layout_height="wrap_content">
 
         <TextView
+            android:id="@+id/my_money_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/my_money" />
 
     </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Banknotes" />
-
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="addBanknotes"
-        android:text="Edit My Money" />
+        android:text="@string/edit_my_money" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="addCurrency"
-        android:text="Add Possible Currency" />
+        android:text="@string/add_possible_currency" />
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="giveALoan"
-        android:text="Give a loan" />
+        android:text="@string/give_a_loan" />
 
     <Button
         android:id="@+id/button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Loan collector"
+        android:text="@string/loan_collector"
         android:onClick="getAvailableLoans"
         />
+
 </LinearLayout>
