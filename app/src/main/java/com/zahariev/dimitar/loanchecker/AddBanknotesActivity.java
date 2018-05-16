@@ -1,5 +1,6 @@
 package com.zahariev.dimitar.loanchecker;
 
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -72,12 +73,14 @@ public class AddBanknotesActivity extends AppCompatActivity implements Banknotes
 
                             UserBanknoteAmountBindModel userBanknoteAmountBindModel = banknoteAmount.getValue(UserBanknoteAmountBindModel.class);
                             EditText amountEditText = new EditText(getApplicationContext());
+                            amountEditText.setTextColor(Color.BLACK);
                             amountEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
                             amountEditText.setId(View.generateViewId());
                             amountEditText.setText(Integer.toString(userBanknoteAmountBindModel.getBanknoteAmount()));
                             Utils.banknotesProgrammaticallyAssignedIds.put(userBanknoteAmountBindModel.getBanknoteType(), amountEditText.getId());
                             banknotesFragmentGridLayout.addView(amountEditText);
                             TextView amountBanknotesTextView = new TextView(getApplicationContext());
+                            amountBanknotesTextView.setTextColor(Color.BLACK);
                             String[] banknoteType = userBanknoteAmountBindModel.getBanknoteType().split("_");
                             amountBanknotesTextView.setText(MessageFormat.format("x {0} {1}", banknoteType[0], banknoteType[1]));
                             banknotesFragmentGridLayout.addView(amountBanknotesTextView);

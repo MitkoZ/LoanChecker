@@ -1,6 +1,7 @@
 package com.zahariev.dimitar.loanchecker;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -41,11 +42,13 @@ public class RepayBanknotesActivity extends AppCompatActivity implements Banknot
             EditText banknoteAmountEditText = new EditText(getApplicationContext());
             banknoteAmountEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
             banknoteAmountEditText.setText("0");
+            banknoteAmountEditText.setTextColor(Color.BLACK);
             int id = View.generateViewId();
             banknotesProgrammaticallyAssignedIds.put(MessageFormat.format("{0}_{1}", possibleBanknote, currency), id);
             banknoteAmountEditText.setId(id);
             TextView currencyTextView = new TextView(getApplicationContext());
             currencyTextView.setText(MessageFormat.format("{0} {1}s", possibleBanknote, currency));
+            currencyTextView.setTextColor(Color.BLACK);
             gridLayout.addView(banknoteAmountEditText);
             gridLayout.addView(currencyTextView);
         }
