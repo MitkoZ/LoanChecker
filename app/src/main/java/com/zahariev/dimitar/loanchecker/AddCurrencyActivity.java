@@ -21,8 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
-
 public class AddCurrencyActivity extends AppCompatActivity {
 
     @Override
