@@ -1,6 +1,9 @@
 package com.zahariev.dimitar.loanchecker;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -28,10 +31,22 @@ import static com.zahariev.dimitar.utils.Utils.loansProgrammaticallyAssignedIds;
 
 public class GivenLoansDropdownActivity extends AppCompatActivity {
 
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context arg0, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals("finish_activity")) {
+                finish();
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loans);
+        registerReceiver(broadcastReceiver, new IntentFilter("finish_activity"));
         final ScrollView loansActivityScrollView = findViewById(R.id.loansActivityScrollView);
         updateUI(loansActivityScrollView);
     }
@@ -64,10 +79,13 @@ public class GivenLoansDropdownActivity extends AppCompatActivity {
                     final LoanBindModel loanBindModel = givenLoan.getValue(LoanBindModel.class);
                     TextView loaneeTextView = new TextView(getApplicationContext());
                     loaneeTextView.setText(MessageFormat.format("Loanee: {0}", loanBindModel.getLoaneeName()));
+                    loaneeTextView.setTextColor(Color.BLACK);
                     TextView returnDateTextView = new TextView(getApplicationContext());
                     returnDateTextView.setText(MessageFormat.format("Return date: {0}", loanBindModel.getReturnDate()));
+                    returnDateTextView.setTextColor(Color.BLACK);
                     TextView moneyTextView = new TextView(getApplicationContext());
                     moneyTextView.setText(MessageFormat.format("Money: {0} {1}", loanBindModel.getAmount(), loanBindModel.getCurrency()));
+                    moneyTextView.setTextColor(Color.BLACK);;
                     final LinearLayout loanLinearLayoutContainer = new LinearLayout(getApplicationContext());
                     final int id = View.generateViewId();
                     loanLinearLayoutContainer.setId(id);

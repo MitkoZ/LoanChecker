@@ -61,8 +61,10 @@ public class CheckALoanActivity extends AppCompatActivity {
                 LinearLayout checkALoanLinearLayout = findViewById(R.id.checkALoanLinearLayout);
                 TextView loaneeTextView = new TextView(getApplicationContext());
                 loaneeTextView.setText("Loanee name: " + loanBindModel.getLoaneeName());
+                loaneeTextView.setTextColor(Color.BLACK);
                 TextView amountTextView = new TextView(getApplicationContext());
                 amountTextView.setText(MessageFormat.format("Amount: {0} {1}", loanBindModel.getAmount(), loanBindModel.getCurrency()));
+                amountTextView.setTextColor(Color.BLACK);
                 DatePicker returnDateDatePicker = new DatePicker(getApplicationContext());
                 returnDateDatePicker.setBackgroundColor(Color.BLACK);
                 int[] returnDateIntArray = Utils.stringArrayToIntArray(loanBindModel.getReturnDate().split("/"));
