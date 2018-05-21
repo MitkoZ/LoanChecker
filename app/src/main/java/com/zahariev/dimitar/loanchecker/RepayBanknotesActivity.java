@@ -77,33 +77,36 @@ public class RepayBanknotesActivity extends AppCompatActivity implements Banknot
     private void repayLoan(Integer loanMoney, String userGivenLoanId, String currency) {
         HashMap<Integer, Integer> moneyAmountMap = new HashMap<>();
         for (String banknoteProgrammaticalyAssignedIdKey : banknotesProgrammaticallyAssignedIds.keySet()) {
-            EditText moneyAmountEditText = findViewById(banknotesProgrammaticallyAssignedIds.get(banknoteProgrammaticalyAssignedIdKey));
-            Integer money;
-            try {
-                money = Integer.parseInt(moneyAmountEditText.getText().toString());
-            } catch (NumberFormatException numberFormatException) {
-                Toast.makeText(this, "Please enter a valid amount of money", Toast.LENGTH_SHORT).show();
-                return;
-            }
+            if (banknoteProgrammaticalyAssignedIdKey.split("_")[1].equals(currency)) {
+                EditText moneyAmountEditText = findViewById(banknotesProgrammaticallyAssignedIds.get(banknoteProgrammaticalyAssignedIdKey));
+                Integer money;
+                try {
+                    money = Integer.parseInt(moneyAmountEditText.getText().toString());
+                } catch (NumberFormatException numberFormatException) {
+                    Toast.makeText(this, "Please enter a valid amount of money", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-            if (money < 0) {
-                Toast.makeText(this, "Please enter a valid amount of money", Toast.LENGTH_SHORT).show();
-                return;
+                if (money < 0) {
+                    Toast.makeText(this, "Please enter a valid amount of money", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                moneyAmountMap.put(Integer.parseInt(banknoteProgrammaticalyAssignedIdKey.split("_")[0]), money);
+
+                int totalInputMoney = getTotalMoneyFromBanknotes(moneyAmountMap);
+                if (totalInputMoney == loanMoney) {
+                    removeLoan(userGivenLoanId);
+                    updateBanknotes(moneyAmountMap, getIntent().getExtras().get("userId").toString(), currency);
+                    Toast.makeText(this, "Loan repaid successfully!", Toast.LENGTH_SHORT).show();
+                    Intent finishCheckALoanActivityIntent = new Intent("finish_activity");
+                    sendBroadcast(finishCheckALoanActivityIntent);
+                    finish();
+                } else if (totalInputMoney < loanMoney) {
+                    Toast.makeText(this, "Not enough money", Toast.LENGTH_SHORT).show();
+                } else if (totalInputMoney > loanMoney) {
+                    Toast.makeText(this, "You are giving more than enough money", Toast.LENGTH_LONG).show();
+                }
             }
-            moneyAmountMap.put(Integer.parseInt(banknoteProgrammaticalyAssignedIdKey.split("_")[0]), money);
-        }
-        int totalInputMoney = getTotalMoneyFromBanknotes(moneyAmountMap);
-        if (totalInputMoney == loanMoney) {
-            removeLoan(userGivenLoanId);
-            updateBanknotes(moneyAmountMap, getIntent().getExtras().get("userId").toString(), currency);
-            Toast.makeText(this, "Loan repaid successfully!", Toast.LENGTH_SHORT).show();
-            Intent finishCheckALoanActivityIntent = new Intent("finish_activity");
-            sendBroadcast(finishCheckALoanActivityIntent);
-            finish();
-        } else if (totalInputMoney < loanMoney) {
-            Toast.makeText(this, "Not enough money", Toast.LENGTH_SHORT).show();
-        } else if (totalInputMoney > loanMoney) {
-            Toast.makeText(this, "You are giving more than enough money", Toast.LENGTH_LONG).show();
         }
     }
 
