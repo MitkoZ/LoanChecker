@@ -92,23 +92,23 @@ public class RepayBanknotesActivity extends AppCompatActivity implements Banknot
                     return;
                 }
                 moneyAmountMap.put(Integer.parseInt(banknoteProgrammaticalyAssignedIdKey.split("_")[0]), money);
-
-                int totalInputMoney = getTotalMoneyFromBanknotes(moneyAmountMap);
-                if (totalInputMoney == loanMoney) {
-                    removeLoan(userGivenLoanId);
-                    updateBanknotes(moneyAmountMap, getIntent().getExtras().get("userId").toString(), currency);
-                    Toast.makeText(this, "Loan repaid successfully!", Toast.LENGTH_SHORT).show();
-                    Intent finishCheckALoanActivityIntent = new Intent("finish_activity");
-                    sendBroadcast(finishCheckALoanActivityIntent);
-                    finish();
-                } else if (totalInputMoney < loanMoney) {
-                    Toast.makeText(this, "Not enough money", Toast.LENGTH_SHORT).show();
-                } else if (totalInputMoney > loanMoney) {
-                    Toast.makeText(this, "You are giving more than enough money", Toast.LENGTH_LONG).show();
-                }
             }
         }
+        int totalInputMoney = getTotalMoneyFromBanknotes(moneyAmountMap);
+        if (totalInputMoney == loanMoney) {
+            removeLoan(userGivenLoanId);
+            updateBanknotes(moneyAmountMap, getIntent().getExtras().get("userId").toString(), currency);
+            Toast.makeText(this, "Loan repaid successfully!", Toast.LENGTH_SHORT).show();
+            Intent finishCheckALoanActivityIntent = new Intent("finish_activity");
+            sendBroadcast(finishCheckALoanActivityIntent);
+            finish();
+        } else if (totalInputMoney < loanMoney) {
+            Toast.makeText(this, "Not enough money", Toast.LENGTH_SHORT).show();
+        } else if (totalInputMoney > loanMoney) {
+            Toast.makeText(this, "You are giving more than enough money", Toast.LENGTH_LONG).show();
+        }
     }
+
 
     private void updateBanknotes(final HashMap<Integer, Integer> moneyAmountMap, String userId, final String currency) {
         final DatabaseReference database = FirebaseDatabase.getInstance().getReference("userBanknoteAmount");
